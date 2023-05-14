@@ -2,9 +2,9 @@ import Link from 'next/link';
 
 const menuItem = [
   {
-    "title": "Looper",
+    "title": "Youtube Looper",
     "link": "looper",
-    "description": "loop any part of the video in a super smooth way by adjusting the slider. Can be super helpful while learning specific part of the song or music. videos of multiple formats from multiple sources are supported.",
+    "description": "Loop any part of the video with ease by start and end time on seconds that you want to be repeated. Can be super helpful while learning specific part of the song or music.",
   }
 ]
 

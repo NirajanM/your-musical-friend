@@ -54,7 +54,7 @@ export default function page() {
                 <>
                     <ReactPlayer url={url} controls={true} playing={play} volume={slider} onEnded={restartloop} />
 
-                    <div className="w-full max-w-2xl mx-auto flex flex-start gap-4">Volume:<input type="range" min={0} max={1} value={slider} step={0.01} onChange={(e) => { setSlider(e.target.value) }} className="w-full max-w-sm" /></div>
+                    <div className="w-full max-w-2xl mx-auto flex flex-start gap-4">Volume:<input type="range" min={0} max={1} value={slider} step={0.01} onChange={(e) => { setSlider(e.target.value) }} className="w-full max-w-xl" /></div>
 
                     <div className="w-full max-w-2xl mx-auto flex flex-col sm:flex-row gap-4">
                         <div className="flex flex-start gap-4">Start time:<input type="number" value={seekTime} onChange={(e) => { setSeekTime(e.target.value) }} placeholder="in seconds" className="px-1 border rounded-lg bg-transparent" />

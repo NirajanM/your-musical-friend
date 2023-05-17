@@ -15,10 +15,10 @@ const menuItem = [
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-8 md:p-24 ">
+    <main className="flex flex-col items-center justify-around p-8 md:p-24 gap-8">
       {menuItem.map(item => {
         return (
-          <Link href={`/${item.link}`} className="flex flex-col justify-around items-center gap-4 border-2 rounded-sm lg:rounded-lg p-4 lg:p-8 hover:bg-slate-50/10 max-w-4xl">
+          <Link key={item.title} href={`/${item.link}`} className="flex flex-col justify-around items-center gap-4 border-2 rounded-sm lg:rounded-lg p-4 lg:p-8 hover:bg-slate-50/10 max-w-4xl">
             <h1 className="text-lg sm:text-xl md:text-2xl lg:text-4xl font-bold lg:font-black">{item.title}</h1>
             <p>{item.description}</p>
           </Link>);

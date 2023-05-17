@@ -7,7 +7,14 @@ export default function page() {
     const [tunerState, setTunerState] = useState(false);
 
     const handleTuner = () => {
-        setTunerState(!tunerState);
+        if (tunerState) {
+            setTunerState(false);
+            stop();
+        }
+        else {
+            setTunerState(true);
+            start();
+        }
     };
 
     const guitarNotes = [
@@ -34,12 +41,46 @@ export default function page() {
         'G#'
     ];
 
+    //audio context controls:
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    let analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 2048;
+    const buflen = 2048;
+    let buf = new Float32Array(buflen);
+
+    const start = async () => {
+        const input = await getMicInput();
+
+        if (audioCtx.state === "suspended") {
+            await audioCtx.resume();
+        }
+        setTunerState(true);
+        audioCtx.createMediaStreamSource(input);
+        console.log(audioCtx);
+    };
+
+    const stop = () => {
+        audioCtx.close();
+        setTunerState(false);
+    };
+
+    const getMicInput = () => {
+        return navigator.mediaDevices.getUserMedia({
+            audio: {
+                echoCancellation: true,
+                autoGainControl: false,
+                noiseSuppression: false,
+                latency: 0,
+            },
+        });
+    };
+
     return (
         <main className="flex min-h-screen min-w-screen justify-center items-center flex-col gap-8">
             <div>
                 <div id="guitar-notes" className="flex gap-3">
-                    {guitarNotes.map((notation) => {
-                        return <span className="rounded-full border py-1 px-2">{notation}</span>
+                    {guitarNotes.map((notation, index) => {
+                        return <span key={index} className="rounded-full border py-1 px-2">{notation}</span>
                     })}
                 </div>
             </div>

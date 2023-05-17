@@ -1,11 +1,18 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react";
+import AudioContext from "@/context/audioContext";
+
+
+const audioCtx = AudioContext.getAudioContext();
+const analyserNode = new AnalyserNode(audioCtx, { fftSize: 2048 });
+
 
 export default function page() {
 
     const [tunerState, setTunerState] = useState(false);
 
+    //toogling tuner
     const handleTuner = () => {
         if (tunerState) {
             setTunerState(false);
@@ -42,28 +49,30 @@ export default function page() {
     ];
 
     //audio context controls:
+    const [source, setSource] = useState(null);
 
     useEffect(() => {
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        let analyser = audioCtx.createAnalyser();
-        analyser.fftSize = 2048;
-        const buflen = 2048;
-        let buf = new Float32Array(buflen);
-    }, []);
+        if (source != null) {
+            source.connect(analyserNode);
+        }
+    }, [source]);
 
 
     const start = async () => {
-        const input = await getMicInput();
-
+        const mic = await getMicInput();
         if (audioCtx.state === "suspended") {
             await audioCtx.resume();
         }
         setTunerState(true);
-        audioCtx.createMediaStreamSource(input);
-        console.log(audioCtx);
+        setSource(audioCtx.createMediaStreamSource(mic));
     };
 
+    function updatePitch() {
+
+    }
+
     const stop = () => {
+        source.disconnect(analyserNode);
         audioCtx.close();
         setTunerState(false);
     };

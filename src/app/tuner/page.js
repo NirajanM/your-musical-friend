@@ -1,12 +1,6 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react";
-import AudioContext from "@/context/audioContext";
-
-
-const audioCtx = AudioContext.getAudioContext();
-const analyserNode = new AnalyserNode(audioCtx, { fftSize: 2048 });
-
 
 export default function page() {
 
@@ -57,6 +51,11 @@ export default function page() {
         }
     }, [source]);
 
+    useEffect(() => {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 2048;
+    }, []);
 
     const start = async () => {
         const mic = await getMicInput();

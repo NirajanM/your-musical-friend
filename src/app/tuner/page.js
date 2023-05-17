@@ -42,11 +42,15 @@ export default function page() {
     ];
 
     //audio context controls:
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    let analyser = audioCtx.createAnalyser();
-    analyser.fftSize = 2048;
-    const buflen = 2048;
-    let buf = new Float32Array(buflen);
+
+    useEffect(() => {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 2048;
+        const buflen = 2048;
+        let buf = new Float32Array(buflen);
+    }, []);
+
 
     const start = async () => {
         const input = await getMicInput();

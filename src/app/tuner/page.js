@@ -114,6 +114,7 @@ export default function page() {
         <main className="flex min-h-screen min-w-screen justify-center items-center flex-col gap-8">
             <div>
                 <div id="guitar-notes" className="flex gap-3">
+                    {pitch}
                     {guitarNotes.map((notation, index) => {
                         return <span key={index} className="rounded-full border py-1 px-2">{notation}</span>
                     })}

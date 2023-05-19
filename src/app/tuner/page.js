@@ -44,17 +44,15 @@ export default function page() {
 
     //audio context controls:
     const [source, setSource] = useState(null);
+    const [audioCtx, setAudioCtx] = useState(null);
+    const [analyserNode, setAnalyserNode] = useState(null);
 
     useEffect(() => {
-        if (source != null) {
-            source.connect(analyserNode);
-        }
-    }, [source]);
-
-    useEffect(() => {
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        let analyser = audioCtx.createAnalyser();
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const analyser = ctx.createAnalyser();
         analyser.fftSize = 2048;
+        setAudioCtx(ctx);
+        setAnalyserNode(analyser);
     }, []);
 
     const start = async () => {
@@ -66,12 +64,20 @@ export default function page() {
         setSource(audioCtx.createMediaStreamSource(mic));
     };
 
+    useEffect(() => {
+        if (source != null && analyserNode != null) {
+            source.connect(analyserNode);
+        }
+    }, [source, analyserNode]);
+
     function updatePitch() {
 
     }
 
     const stop = () => {
-        source.disconnect(analyserNode);
+        if (source != null && analyserNode != null) {
+            source.disconnect(analyserNode);
+        }
         audioCtx.close();
         setTunerState(false);
     };

@@ -1,10 +1,12 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react";
+import autoCorrelate from "./pitchDetection";
 
 export default function page() {
 
     const [tunerState, setTunerState] = useState(false);
+    const [pitch, setPitch] = useState(null);
 
     //toogling tuner
     const handleTuner = () => {
@@ -70,15 +72,8 @@ export default function page() {
         }
     }, [source, analyserNode]);
 
-    function updatePitch() {
-
-    }
-
     const stop = () => {
-        if (source != null && analyserNode != null) {
-            source.disconnect(analyserNode);
-        }
-        audioCtx.close();
+        source.disconnect(analyserNode);
         setTunerState(false);
     };
 
@@ -92,6 +87,28 @@ export default function page() {
             },
         });
     };
+
+    //update pitch :
+
+    function updatePitch() {
+        const bufferLength = analyserNode.fftSize;
+        const dataArray = new Float32Array(bufferLength);
+        analyserNode.getFloatTimeDomainData(dataArray);
+
+        const pitchDetectionResult = autoCorrelate(dataArray, audioCtx.sampleRate);
+        const detectedPitch = pitchDetectionResult.pitch;
+
+        setPitch(detectedPitch);
+
+        requestAnimationFrame(updatePitch);
+    }
+
+    useEffect(() => {
+        if (analyserNode) {
+            requestAnimationFrame(updatePitch);
+        }
+        console.log(pitch);
+    }, [analyserNode]);
 
     return (
         <main className="flex min-h-screen min-w-screen justify-center items-center flex-col gap-8">

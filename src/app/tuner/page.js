@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import autoCorrelate from "./pitchDetection";
 
 export default function page() {
@@ -50,57 +50,81 @@ export default function page() {
     const [analyserNode, setAnalyserNode] = useState(null);
 
     useEffect(() => {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const analyser = ctx.createAnalyser();
-        analyser.fftSize = 2048;
-        setAudioCtx(ctx);
-        setAnalyserNode(analyser);
+        const initializeAudio = async () => {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const analyser = ctx.createAnalyser();
+                analyser.fftSize = 2048;
+
+                setAudioCtx(ctx);
+                setAnalyserNode(analyser);
+            } catch (error) {
+                console.error("Failed to initialize audio: ", error);
+            }
+        };
+
+        initializeAudio();
     }, []);
 
+
     const start = async () => {
-        const mic = await getMicInput();
-        if (audioCtx.state === "suspended") {
-            await audioCtx.resume();
+        try {
+            const mic = await getMicInput();
+            if (audioCtx.state === "suspended") {
+                await audioCtx.resume();
+            }
+            setTunerState(true);
+            setSource(audioCtx.createMediaStreamSource(mic));
+        } catch (error) {
+            console.error("Failed to start tuner: ", error);
         }
-        setTunerState(true);
-        setSource(audioCtx.createMediaStreamSource(mic));
     };
 
     useEffect(() => {
         if (source != null && analyserNode != null) {
             source.connect(analyserNode);
         }
+        console.log(source);
     }, [source, analyserNode]);
 
     const stop = () => {
-        source.disconnect(analyserNode);
-        setTunerState(false);
+        if (source && analyserNode) {
+            source.disconnect(analyserNode);
+            setTunerState(false);
+        }
     };
 
-    const getMicInput = () => {
-        return navigator.mediaDevices.getUserMedia({
-            audio: {
-                echoCancellation: true,
-                autoGainControl: false,
-                noiseSuppression: false,
-                latency: 0,
-            },
-        });
+    const getMicInput = async () => {
+        try {
+            const mediaStream = await navigator.mediaDevices.getUserMedia({
+                audio: {
+                    echoCancellation: true,
+                    autoGainControl: false,
+                    noiseSuppression: false,
+                    latency: 0,
+                },
+            });
+            return mediaStream;
+        } catch (error) {
+            console.error("Failed to get microphone input: ", error);
+        }
     };
 
     //update pitch :
 
     function updatePitch() {
-        const bufferLength = analyserNode.fftSize;
-        const dataArray = new Float32Array(bufferLength);
-        analyserNode.getFloatTimeDomainData(dataArray);
+        if (analyserNode && audioCtx) {
+            const bufferLength = analyserNode.fftSize;
+            const dataArray = new Float32Array(bufferLength);
+            analyserNode.getFloatTimeDomainData(dataArray);
 
-        const pitchDetectionResult = autoCorrelate(dataArray, audioCtx.sampleRate);
-        const detectedPitch = pitchDetectionResult.pitch;
+            const pitchDetectionResult = autoCorrelate(dataArray, audioCtx.sampleRate);
+            const detectedPitch = pitchDetectionResult.pitch;
 
-        setPitch(detectedPitch);
+            setPitch(detectedPitch);
 
-        requestAnimationFrame(updatePitch);
+            requestAnimationFrame(updatePitch);
+        }
     }
 
     useEffect(() => {

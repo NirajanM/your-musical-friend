@@ -46,6 +46,7 @@ export default function page() {
 
     //audio context controls:
     const [source, setSource] = useState(null);
+    const [pitchNote, setPitchNote] = useState(null);
     const [audioCtx, setAudioCtx] = useState(null);
     const [analyserNode, setAnalyserNode] = useState(null);
 
@@ -100,7 +101,12 @@ export default function page() {
     const getMicInput = async () => {
         try {
             const mediaStream = await navigator.mediaDevices.getUserMedia({
-                audio: true,
+                audio: {
+                    echoCancellation: true,
+                    autoGainControl: false,
+                    noiseSuppression: false,
+                    latency: 0,
+                },
             });
             return mediaStream;
         } catch (error) {
@@ -115,12 +121,22 @@ export default function page() {
             const bufferLength = analyserNode.fftSize;
             const dataArray = new Float32Array(bufferLength);
             analyserNode.getFloatTimeDomainData(dataArray);
-
             const pitchDetectionResult = autoCorrelate(dataArray, audioCtx.sampleRate);
             const detectedPitch = pitchDetectionResult;
             setPitch(detectedPitch);
+            setPitchNote(convertPitchToNoteName(detectedPitch));
             requestAnimationFrame(updatePitch);
         }
+    }
+
+    function convertPitchToNoteName(pitch) {
+        if (pitch === -1) {
+            return "No signal";
+        }
+        const octave = Math.floor((Math.log2(pitch / 440) + 4) * 12);
+        const noteIndex = octave % 12;
+
+        return allNotes[noteIndex];
     }
 
     useEffect(() => {
@@ -132,7 +148,11 @@ export default function page() {
     return (
         <main className="flex min-h-screen min-w-screen justify-center items-center flex-col gap-8">
             <div className="flex flex-col gap-3">
-                {pitch}
+                {pitch !== null ? (
+                    <span className="rounded-full border py-1 px-2">{pitchNote}</span>
+                ) : (
+                    <span>No signal</span>
+                )}
                 <div id="guitar-notes" className="flex gap-3">
                     {guitarNotes.map((notation, index) => {
                         return <span key={index} className="rounded-full border py-1 px-2">{notation}</span>

@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from "react";
 import autoCorrelate from "./pitchDetection";
+import { allNotes, guitarNotes, notes } from "./notestype";
 
 export default function page() {
 
     const [tunerState, setTunerState] = useState(false);
     const [pitch, setPitch] = useState(null);
-
+    const [currentGuitarNote, setCurrentGuitarNote] = useState(null);
     //toogling tuner
     const handleTuner = () => {
         if (tunerState) {
@@ -19,30 +20,6 @@ export default function page() {
             start();
         }
     };
-
-    const guitarNotes = [
-        "E",
-        "A",
-        "D",
-        "G",
-        "B",
-        "E"
-    ];
-
-    const allNotes = [
-        "A",
-        "A#",
-        "B",
-        "C",
-        "C#",
-        "D",
-        'D#',
-        'E',
-        'F',
-        'F#',
-        'G',
-        'G#'
-    ];
 
     //audio context controls:
     const [source, setSource] = useState(null);
@@ -123,48 +100,69 @@ export default function page() {
             analyserNode.getFloatTimeDomainData(dataArray);
             const pitchDetectionResult = autoCorrelate(dataArray, audioCtx.sampleRate);
             const detectedPitch = pitchDetectionResult;
+            const closestNote = getClosestGuitarNote(detectedPitch);
             setPitch(detectedPitch);
             setPitchNote(convertPitchToNoteName(detectedPitch));
+            setCurrentGuitarNote(closestNote);
             requestAnimationFrame(updatePitch);
         }
     }
 
     function convertPitchToNoteName(pitch) {
         if (pitch === -1) {
-            return "No signal";
+            return null;
         }
         const octave = Math.floor((Math.log2(pitch / 440) + 4) * 12);
         const noteIndex = octave % 12;
-
         return allNotes[noteIndex];
     }
 
+    function getClosestGuitarNote(pitch) {
+        let closestNote = null;
+        let closestDiff = Infinity;
+
+        for (let note of guitarNotes) {
+            const noteFrequency = notes.find(n => n.name === note)?.frequency;
+
+            if (noteFrequency) {
+                const diff = Math.abs(pitch - noteFrequency);
+
+                if (diff < closestDiff) {
+                    closestNote = note;
+                    closestDiff = diff;
+                }
+            }
+        }
+
+        return closestNote;
+    }
+
     useEffect(() => {
-        if (analyserNode) {
+        if (analyserNode && tunerState) {
             requestAnimationFrame(updatePitch);
         }
-    }, [analyserNode]);
+    }, [analyserNode, tunerState]);
 
     return (
-        <main className="flex min-h-screen min-w-screen justify-center items-center flex-col gap-8">
-            <div className="flex flex-col gap-3">
-                {pitch !== null ? (
-                    <span className="rounded-full border py-1 px-2">{pitchNote}</span>
-                ) : (
-                    <span>No signal</span>
-                )}
-                <div id="guitar-notes" className="flex gap-3">
-                    {guitarNotes.map((notation, index) => {
-                        return <span key={index} className="rounded-full border py-1 px-2">{notation}</span>
-                    })}
-                </div>
+        <main className="relative flex min-h-screen min-w-screen justify-center items-center flex-col gap-8">
+            <div className="absolute flex justify-center items-center h-28 top-8">
+                <span className="text-5xl font-black">{tunerState ? currentGuitarNote : null}</span>
             </div>
-            <button
-                onClick={handleTuner}
-                className="border rounded-lg py-2 px-4 hover:bg-slate-100/10"
-            >
-                {tunerState ? "Stop Tuner" : "Start Tuner"}
-            </button>
+            <div className="flex justify-center items-center flex-col gap-8">
+                <div className="flex flex-col gap-3">
+                    <div id="guitar-notes" className="flex gap-3 border-t py-4">
+                        {guitarNotes.map((notation, index) => {
+                            return <span key={index} className={(currentGuitarNote === notation) ? "bg-slate-50/50 rounded-full border py-1 px-2" : "rounded-full border py-1 px-2"}>{notation}</span>
+                        })}
+                    </div>
+                </div>
+                <button
+                    onClick={handleTuner}
+                    className="border rounded-lg py-2 px-4 hover:bg-slate-100/10"
+                >
+                    {tunerState ? "Stop Tuner" : "Start Tuner"}
+                </button>
+            </div>
         </main>
     );
 }

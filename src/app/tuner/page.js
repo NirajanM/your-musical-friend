@@ -52,12 +52,15 @@ export default function page() {
     useEffect(() => {
         const initializeAudio = async () => {
             try {
+                console.log("Initializing audio...");
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
                 const analyser = ctx.createAnalyser();
                 analyser.fftSize = 2048;
 
                 setAudioCtx(ctx);
                 setAnalyserNode(analyser);
+                console.log("Audio initialized");
+
             } catch (error) {
                 console.error("Failed to initialize audio: ", error);
             }
@@ -75,6 +78,7 @@ export default function page() {
             }
             setTunerState(true);
             setSource(audioCtx.createMediaStreamSource(mic));
+            console.log("Tuner started!");
         } catch (error) {
             console.error("Failed to start tuner: ", error);
         }
@@ -84,7 +88,6 @@ export default function page() {
         if (source != null && analyserNode != null) {
             source.connect(analyserNode);
         }
-        console.log(source);
     }, [source, analyserNode]);
 
     const stop = () => {
@@ -97,12 +100,7 @@ export default function page() {
     const getMicInput = async () => {
         try {
             const mediaStream = await navigator.mediaDevices.getUserMedia({
-                audio: {
-                    echoCancellation: true,
-                    autoGainControl: false,
-                    noiseSuppression: false,
-                    latency: 0,
-                },
+                audio: true,
             });
             return mediaStream;
         } catch (error) {
@@ -119,10 +117,8 @@ export default function page() {
             analyserNode.getFloatTimeDomainData(dataArray);
 
             const pitchDetectionResult = autoCorrelate(dataArray, audioCtx.sampleRate);
-            const detectedPitch = pitchDetectionResult.pitch;
-
+            const detectedPitch = pitchDetectionResult;
             setPitch(detectedPitch);
-
             requestAnimationFrame(updatePitch);
         }
     }
@@ -131,14 +127,13 @@ export default function page() {
         if (analyserNode) {
             requestAnimationFrame(updatePitch);
         }
-        console.log(pitch);
     }, [analyserNode]);
 
     return (
         <main className="flex min-h-screen min-w-screen justify-center items-center flex-col gap-8">
-            <div>
+            <div className="flex flex-col gap-3">
+                {pitch}
                 <div id="guitar-notes" className="flex gap-3">
-                    {pitch}
                     {guitarNotes.map((notation, index) => {
                         return <span key={index} className="rounded-full border py-1 px-2">{notation}</span>
                     })}

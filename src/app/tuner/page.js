@@ -145,8 +145,10 @@ export default function page() {
 
     return (
         <main className="relative flex min-h-screen min-w-screen justify-center items-center flex-col gap-8">
-            <div className="absolute flex justify-center items-center h-28 top-8">
+            <div className="absolute flex justify-center items-center h-28 top-8 flex-col gap-2">
                 <span className="text-5xl font-black">{tunerState ? currentGuitarNote : null}</span>
+                <span className="text-3xl font-black">{tunerState ? pitchNote : null}</span>
+                <span className="text-xl font-black">{tunerState ? pitch : null}</span>
             </div>
             <div className="flex justify-center items-center flex-col gap-8">
                 <div className="flex flex-col gap-3">

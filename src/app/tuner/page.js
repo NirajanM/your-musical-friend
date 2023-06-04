@@ -152,8 +152,8 @@ export default function page() {
             </div>
             <div className="flex justify-center items-center flex-col gap-8">
                 <div className="flex flex-col gap-3">
-                    <div id="guitar-notes" className="flex gap-3 border-t py-4">
-                        {guitarNotes.map((notation, index) => {
+                    <div id="guitar-notes" className="grid gap-3 border-t py-4 grid-cols-6 items-center text-center even:absolute">
+                        {allNotes.map((notation, index) => {
                             return <span key={index} className={(currentGuitarNote === notation) ? "bg-slate-50/50 rounded-full border py-1 px-2" : "rounded-full border py-1 px-2"}>{notation}</span>
                         })}
                     </div>

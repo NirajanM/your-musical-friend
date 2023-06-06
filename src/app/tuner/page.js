@@ -3,12 +3,13 @@
 import { useState, useEffect } from "react";
 import autoCorrelate from "./pitchDetection";
 import { allNotes, guitarNotes, notes } from "./notestype";
-
+import Image from "next/image";
 export default function page() {
 
     const [tunerState, setTunerState] = useState(false);
     const [pitch, setPitch] = useState(null);
     const [currentGuitarNote, setCurrentGuitarNote] = useState(null);
+    const [showChart, setShowChart] = useState(false);
     //toogling tuner
     const handleTuner = () => {
         if (tunerState) {
@@ -156,11 +157,11 @@ export default function page() {
                     </div>
 
                     <div className="flex-1 flex justify-center items-center flex-col gap-2">
-                        <span className="text-3xl font-black">{tunerState ? "Accurate Note:" : null}</span>
-                        <span className="text-5xl font-black">{tunerState ? pitchNote : null}</span>
                         <span className="text-lg font-black">{tunerState ? "Closest Guitar Note:" : null}</span>
                         <span className="text-3xl font-black">{tunerState ? currentGuitarNote : null}</span>
-                        <span className="text-xl font-black">{tunerState ? pitch : null}</span>
+                        <span className="text-3xl font-black">{tunerState ? "Accurate Note:" : null}</span>
+                        <span className="text-5xl font-black">{tunerState ? pitchNote : null}</span>
+
                     </div>
                 </div>
                 <div className="flex justify-center items-center flex-col gap-8">
@@ -180,6 +181,41 @@ export default function page() {
                     </button>
                 </div>
             </div>
+            {tunerState &&
+                <div className="mt-8 flex flex-col items-center justify-center group gap-1">
+                    <div onClick={() => { setShowChart(!showChart) }} className="flex flex-col items-center justify-center">
+                        <span
+                            className="cursor-pointer group-hover:text-green-200/90 text-lg"
+                        >
+                            {!showChart ? "Show Pitch & Chart" : "Hide Pitch & Chart"}
+                        </span>
+                        {!showChart ?
+                            <Image
+                                src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAACXBIWXMAAAsTAAALEwEAmpwYAAAC4ElEQVR4nO2cvW7bMBRGtbR9ggrNqwVd6qcrWifp4G5du1RbNfRxTiHAigVbP5RDUvdS31liGKF9mWOK4s0HV5UQQgghhBBCCCGEEEIIcQPwG2iAutQ/D1ADf4BflXW48A94qAoD+Aj87SdZORJSnBSuZHgT0g5+1oVcptqrubkSMvw0uV4p3M7lkzsh58fupTAi4/y8PyHepTAhw7UQr1KYkeFeiDcpLMgoQogXKQTIKEaIdSkEyihKiFUprJBRnBBrUlgpw6WQkNP5yOm3zlPl22o4j3EjpJmaHPAFeGdFCgvv3dUKHGbGNJV15iYJPAEvFqQQJqOr9WnLOqMwtT+cJ/kM/AQ+hIzZ6NDXy3it8559xhRWpbBHGValsGcZ1qQgGXakIBl2pCAZdqQgGXakIBl2pCAZdqQgGXakIBl2pCAZ8bK9U007LifnkIZkSKPwB/B+7j1X1Ft2tjfCSsnSDvGe7W0zrZRmbFUmWhmvMVJvQtpcUsZILGNf2V7uuHxlvEztM9vLnVJyyLiep2muC80phUwyxuZplrFCc0gho4ypeZpkqtDIG2o9stGn3MBvxroXkljKd+CYS8bSPE2xVGiKy9eQlJepIoWklEImGcUJSSGFjDJcCkmd7WVFczF2DSVlew/9xjt4LmZvqY0po6u1yyOXnO09Dm9NQ8YsMddcjCCjq/UYOsYsW+ewlljxz6xTMQlGq1LYowyrUtizDGtSkAw7UpAMl9neU7GXKYfZ3tPuZBjO9p52KyOwlf4V+Bw6Zs3rjxz6nvvAhNtDXywifeofAn5HK2MrKUiGHSlIRjze0AJvB2O0Z8QkYCM+LHSJtYEbat03E9le3U2lksLlnHIjZea1vunW1pAU4FHnjA0Pj1Ps/tAXCzI0F0WGu68erYxCghMi8p6CZOSBxNleEVkKkrENRM72ijhS6hjZXhERAr44QGSGO7O9QgghhBBCCCGEEEIIIUSVjP9I6pMyml3z0QAAAABJRU5ErkJggg=="
+                                className="text-green-200 group-hover:scale-125"
+                                width={40}
+                                height={40}
+                            /> :
+                            <Image
+                                src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAACXBIWXMAAAsTAAALEwEAmpwYAAACwklEQVR4nO2czU7cMBRGvZn2CRrBq8GOt4NW0EW7KksWleiqs+BxviooFlE0rvNn+zo+RxpplOQGT07sGztXOAcAAAAAAAAAAAAAUBxJnaQXSa/999LtaRpJXyT91Qdvkq5Lt6vlnnEeRJwn3+kpBXvGm6SrC9voKaVkuPA+pJSS4UFKuZzRDds/Sfom6S52LCSW0SPpQdKjpJMbgZREKHK3S7qZykBKwZwRg5xSIGfEYPhKK+P7pZwROM9dH4MUAzJ6hp7UxyAl89PUn0uLi/2xQwxS9pQRepqaxITikLKUNUlXCxYXkZL40VYrFhdHUn5K+hw4T9trX3vJcOF9SCklw4OUTJM+LcgzMx4QSPSxu3y4SE+SfvgxPhYTkc7wZUWGBymGZHiQYkiGBymGZHiQYkiGp2kp1mQ0LcWqjCal5C5I0Mra3gWTx4c92lmM4d3E2iX084aLujU+JOXmPzGvzjqji7NmCb3LXdu7Yen/HWeduQ3deQZ+tWWMXxN7KCF7y3DhfcmkHEZIKhm5pRxCyM45oxsl3q/D55Tq7yz5naYINTShjKfJJ4uUqoWkGKY0mWTuPZmbMXmsU0gOGe7j+GxSqhSSU0ZuKdUJKSEjp5QahaRM4KcZ5zklTvTVCckiQ/Ha3lRSqhOSfJjSjH8ckHj4qkLIs6TfmXrGeRQTW7Xdu6f0v/GXOxp7vcxSSy+danmzKKTYkeFBisF37qKn2JHhQcoMqO01BLW9hihdpyVyih0ZHqQYkuFpWoo1GU1LsSqjSSmR2t77mQuFXcl2Tm6e+5LtTF3be2tBxkIpt5Nt1PamhNreAjkjBrW9hmR4qO01JKPl2l5zPWOtlOqF1CBjiZSqhdQkw0Ntr0FEba89qO01SNO1vVY5Sm1vFQl8LhdKV6sScigZTdX21oaOXNsLAAAAAAAAAAAAAG47/wCPmJLR6XEwvgAAAABJRU5ErkJggg=="
+                                className="text-green-200 group-hover:scale-125"
+                                width={40}
+                                height={40}
+                            />
+                        }
+                    </div>
+                    {showChart &&
+                        <>
+                            <span className="text-xl font-black my-5">{pitch} Hz</span>
+                            <Image
+                                src="/notes.jpg"
+                                width={800}
+                                height={1650}
+                            />
+                        </>
+                    }
+                </div>
+            }
         </main>
     );
 }

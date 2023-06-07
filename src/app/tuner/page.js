@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import autoCorrelate from "./pitchDetection";
-import { allNotes, guitarNotes, notes } from "./notestype";
+import { allNotes, guitarNotes, notes, allNotesWithFreq } from "./notestype";
 import Image from "next/image";
 export default function page() {
 
@@ -10,6 +10,7 @@ export default function page() {
     const [pitch, setPitch] = useState(null);
     const [currentGuitarNote, setCurrentGuitarNote] = useState(null);
     const [showChart, setShowChart] = useState(false);
+    const [indicator, setIndicator] = useState(null);
     //toogling tuner
     const handleTuner = () => {
         if (tunerState) {
@@ -46,6 +47,11 @@ export default function page() {
         };
 
         initializeAudio();
+        return () => {
+            if (audioCtx) {
+                audioCtx.close();
+            }
+        };
     }, []);
 
 
@@ -72,8 +78,8 @@ export default function page() {
     const stop = () => {
         if (source && analyserNode) {
             source.disconnect(analyserNode);
-            setTunerState(false);
         }
+        setTunerState(false);
     };
 
     const getMicInput = async () => {
@@ -103,8 +109,9 @@ export default function page() {
             const detectedPitch = pitchDetectionResult;
             const closestNote = getClosestGuitarNote(detectedPitch);
             setPitch(detectedPitch);
-            setPitchNote(convertPitchToNoteName(detectedPitch));
             setCurrentGuitarNote(closestNote);
+            setPitchNote(convertPitchToNoteName(detectedPitch));
+            detectNoteOffset(detectedPitch);
             requestAnimationFrame(updatePitch);
         }
     }
@@ -138,6 +145,25 @@ export default function page() {
         return closestNote;
     }
 
+    function detectNoteOffset(pitch) {
+        const octave = Math.floor((Math.log2(pitch / 440) + 4) * 12);
+        const noteIndex = octave % 12;
+        const detectedNoteFrequency = pitch;
+        const matchedNoteFrequency = allNotesWithFreq[noteIndex]?.frequency;
+        const offset = detectedNoteFrequency - matchedNoteFrequency;
+
+        // Define thresholds for classification
+        const tolerance = 5; // Adjust this value based on your preference
+
+        if (offset > tolerance) {
+            setIndicator("Too High")
+        } else if (offset < -tolerance) {
+            setIndicator("Too Low")
+        } else {
+            setIndicator("Good")
+        }
+    }
+
     useEffect(() => {
         if (analyserNode && tunerState) {
             requestAnimationFrame(updatePitch);
@@ -161,7 +187,7 @@ export default function page() {
                         <span className="text-3xl font-black">{tunerState ? currentGuitarNote : null}</span>
                         <span className="text-3xl font-black">{tunerState ? "Accurate Note:" : null}</span>
                         <span className="text-5xl font-black">{tunerState ? pitchNote : null}</span>
-
+                        <span className={indicator === "Good" ? "text-yellow" : "text-red"}>{tunerState && indicator}</span>
                     </div>
                 </div>
                 <div className="flex justify-center items-center flex-col gap-8">

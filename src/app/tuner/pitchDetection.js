@@ -53,7 +53,5 @@ export default function autoCorrelate(buf, sampleRate) {
     if (a) T0 = T0 - b / (2 * a);
 
     const detectedPitch = sampleRate / T0;
-    console.log("Detected pitch:", detectedPitch);
-
     return detectedPitch;
 };

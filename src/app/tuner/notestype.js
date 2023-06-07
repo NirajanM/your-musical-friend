@@ -4,7 +4,7 @@ export const guitarNotes = [
     "D2",
     "G2",
     "B2",
-    "E4"
+    "E4",
 ];
 export const notes = [
     { name: "E2", frequency: 82.4069 },
@@ -28,4 +28,19 @@ export const allNotes = [
     'F#',
     'G',
     'G#'
+];
+
+export const allNotesWithFreq = [
+    { note: "A", frequency: 27.50 },
+    { note: "A#", frequency: 29.14 },
+    { note: "B", frequency: 30.87 },
+    { note: "C", frequency: 32.70 },
+    { note: "C#", frequency: 34.65 },
+    { note: "D", frequency: 36.71 },
+    { note: "D#", frequency: 38.89 },
+    { note: "E", frequency: 41.20 },
+    { note: "F", frequency: 43.65 },
+    { note: "F#", frequency: 46.25 },
+    { note: "G", frequency: 49.00 },
+    { note: "G#", frequency: 51.91 }
 ];

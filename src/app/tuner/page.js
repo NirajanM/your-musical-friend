@@ -105,13 +105,11 @@ export default function page() {
             const bufferLength = analyserNode.fftSize;
             const dataArray = new Float32Array(bufferLength);
             analyserNode.getFloatTimeDomainData(dataArray);
-            const pitchDetectionResult = autoCorrelate(dataArray, audioCtx.sampleRate);
-            const detectedPitch = pitchDetectionResult;
-            const closestNote = getClosestGuitarNote(detectedPitch);
+            const detectedPitch = autoCorrelate(dataArray, audioCtx.sampleRate);
             setPitch(detectedPitch);
-            setCurrentGuitarNote(closestNote);
             setPitchNote(convertPitchToNoteName(detectedPitch));
-            detectNoteOffset(detectedPitch);
+            const closestNote = getClosestGuitarNote(detectedPitch);
+            setCurrentGuitarNote(closestNote);
             requestAnimationFrame(updatePitch);
         }
     }
@@ -122,7 +120,34 @@ export default function page() {
         }
         const octave = Math.floor((Math.log2(pitch / 440) + 4) * 12);
         const noteIndex = octave % 12;
-        return allNotes[noteIndex];
+
+
+        //destructuring clostest note found!
+        const baseNote = allNotes[noteIndex]?.note;
+        const baseFrequency = allNotes[noteIndex]?.frequency;
+
+        //getting ratio in exact
+        const ratio = pitch / baseFrequency;
+
+        //calculating octave
+        const numOctaves = Math.log2(ratio);
+
+        //octave equivalent of the base frequency with respect to octave
+        const octaveEquivalent = baseFrequency * Math.pow(2, numOctaves);
+        const offset = pitch - octaveEquivalent;
+        console.log("offset: " + offset, "octaveEquivalent: " + octaveEquivalent, "pitch: " + pitch,)
+
+        // Define thresholds for classification
+        const tolerance = 1; // Adjust this value based on your preference
+
+        if (offset > tolerance) {
+            setIndicator("Too High")
+        } else if (offset < -tolerance) {
+            setIndicator("Too Low")
+        } else {
+            setIndicator("Good")
+        }
+        return baseNote;
     }
 
     function getClosestGuitarNote(pitch) {
@@ -143,25 +168,6 @@ export default function page() {
         }
 
         return closestNote;
-    }
-
-    function detectNoteOffset(pitch) {
-        const octave = Math.floor((Math.log2(pitch / 440) + 4) * 12);
-        const noteIndex = octave % 12;
-        const detectedNoteFrequency = pitch;
-        const matchedNoteFrequency = allNotesWithFreq[noteIndex]?.frequency;
-        const offset = detectedNoteFrequency - matchedNoteFrequency;
-
-        // Define thresholds for classification
-        const tolerance = 5; // Adjust this value based on your preference
-
-        if (offset > tolerance) {
-            setIndicator("Too High")
-        } else if (offset < -tolerance) {
-            setIndicator("Too Low")
-        } else {
-            setIndicator("Good")
-        }
     }
 
     useEffect(() => {
@@ -195,7 +201,7 @@ export default function page() {
                     <div className="flex flex-col gap-3 items-center justify-center">
                         <div id="guitar-notes" className="grid gap-3 border-t py-4 grid-cols-6 items-center text-center even:absolute">
                             {allNotes.map((notation, index) => {
-                                return <span key={index} className={(pitchNote === notation) ? "bg-slate-50/50 rounded-full border py-1 px-2" : "rounded-full border py-1 px-2"}>{notation}</span>
+                                return <span key={index} className={(pitchNote === notation.note) ? "bg-slate-50/50 rounded-full border py-1 px-2" : "rounded-full border py-1 px-2"}>{notation.note}</span>
                             })}
                         </div>
                     </div>

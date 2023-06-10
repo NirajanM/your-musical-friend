@@ -119,26 +119,21 @@ export default function page() {
             return null;
         }
 
-        const octave = Math.floor((Math.log2(pitch / 27.50) + 4) * 12);
-        const noteIndex = (octave + 3) % 12;
+        const octave = Math.floor((Math.log2(pitch / 440) + 4) * 12);
+        const noteIndex = octave % 12;
 
         //destructuring clostest note found!
-        const baseNote = allNotes[noteIndex]?.note;
-        const baseFrequency = allNotes[noteIndex]?.frequency;
+        const { note, frequency } = allNotes[noteIndex] || {};
 
-        //getting ratio in exact
-        const ratio = pitch / baseFrequency;
+        // Calculating the expected frequency based on the detected note
+        const expectedFrequency = frequency * Math.pow(2, ((octave - 4) + noteIndex) / 12);
 
-        //calculating octave
-        const numOctaves = Math.log2(ratio);
-
-        //octave equivalent of the base frequency with respect to octave
-        const octaveEquivalent = baseFrequency * Math.pow(2, numOctaves);
-        const offset = pitch - octaveEquivalent;
-        console.log("offset: " + offset, "octaveEquivalent: " + octaveEquivalent, "pitch: " + pitch,)
+        // Calculating the offset
+        const offset = pitch - expectedFrequency;
+        console.log("expectedFrequency: " + expectedFrequency, "pitch: " + pitch,)
 
         // Define thresholds for classification
-        const tolerance = 1; // Adjust this value based on your preference
+        const tolerance = 0.5; // Adjust this value based on your preference
 
         if (offset > tolerance) {
             setIndicator("Too High")
@@ -147,7 +142,7 @@ export default function page() {
         } else {
             setIndicator("Good")
         }
-        return baseNote;
+        return note;
     }
 
     function getClosestGuitarNote(pitch) {

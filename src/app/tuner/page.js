@@ -116,11 +116,11 @@ export default function page() {
 
     function convertPitchToNoteName(pitch) {
         if (pitch === -1) {
-            return "";
+            return null;
         }
-        const octave = Math.floor((Math.log2(pitch / 440) + 4) * 12);
-        const noteIndex = octave % 12;
 
+        const octave = Math.floor((Math.log2(pitch / 27.50) + 4) * 12);
+        const noteIndex = (octave + 3) % 12;
 
         //destructuring clostest note found!
         const baseNote = allNotes[noteIndex]?.note;

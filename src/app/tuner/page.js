@@ -133,7 +133,6 @@ export default function page() {
 
         // Calculating the offset
         const offset = pitch - expectedFrequency;
-        console.log("expectedFrequency: " + expectedFrequency, "pitch: " + pitch,)
 
         // Define thresholds for classification
         const tolerance = 0.5; // Adjust this value based on your preference

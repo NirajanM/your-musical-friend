@@ -16,16 +16,16 @@ export const notes = [
 ];
 
 export const allNotes = [
+    { note: "C", frequency: 16.35 },
+    { note: "C#", frequency: 17.32 },
+    { note: "D", frequency: 18.35 },
+    { note: "D#", frequency: 19.45 },
+    { note: "E", frequency: 20.60 },
+    { note: "F", frequency: 21.83 },
+    { note: "F#", frequency: 23.12 },
+    { note: "G", frequency: 24.50 },
+    { note: "G#", frequency: 25.96 },
     { note: "A", frequency: 27.50 },
     { note: "A#", frequency: 29.14 },
-    { note: "B", frequency: 30.87 },
-    { note: "C", frequency: 32.70 },
-    { note: "C#", frequency: 34.65 },
-    { note: "D", frequency: 36.71 },
-    { note: "D#", frequency: 38.89 },
-    { note: "E", frequency: 41.20 },
-    { note: "F", frequency: 43.65 },
-    { note: "F#", frequency: 46.25 },
-    { note: "G", frequency: 49.00 },
-    { note: "G#", frequency: 51.91 }
+    { note: "B", frequency: 30.87 }
 ];

@@ -119,14 +119,17 @@ export default function page() {
             return null;
         }
 
-        const octave = Math.floor((Math.log2(pitch / 440) + 4) * 12);
-        const noteIndex = octave % 12;
+
+        const halfSteps = Math.round(12 * Math.log2(pitch / 16.35)); // Calculate the number of half steps away from the reference note
+
+        const noteIndex = (halfSteps + 12) % 12; // Get the index of the note in the array using modulo
+        const octave = Math.floor((halfSteps + 12) / 12) - 1; // Calculate the octave based on the number of half steps
 
         //destructuring clostest note found!
         const { note, frequency } = allNotes[noteIndex] || {};
 
         // Calculating the expected frequency based on the detected note
-        const expectedFrequency = frequency * Math.pow(2, ((octave - 4) + noteIndex) / 12);
+        const expectedFrequency = frequency * Math.pow(2, octave);
 
         // Calculating the offset
         const offset = pitch - expectedFrequency;

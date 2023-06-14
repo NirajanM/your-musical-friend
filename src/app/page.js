@@ -12,7 +12,7 @@ const menuItem = [
     "title": "Tuner",
     "link": "tuner",
     "icon": "/tuner.png",
-    "description": "Tune your musical intrument to the perfect pitch online, without having to keep a seperate app installed in your phone taking unnecessary space.",
+    "description": "Tune your musical instrument to perfect pitch, without having to keep a seperate app installed in your phone taking unnecessary space, directly from the site online!",
   }
 ]
 

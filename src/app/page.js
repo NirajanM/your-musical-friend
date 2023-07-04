@@ -6,13 +6,13 @@ const menuItem = [
     "title": "Youtube Looper",
     "link": "looper",
     "icon": "/youtubelooper.png",
-    "description": "Loop any part of the video with ease by providing start and end time on seconds that you want to be repeated. Can be super helpful while learning specific part of the song or music.",
+    "description": "You can easily loop any part of the video by providing the start and end times in seconds that you want to be repeated. This feature can be incredibly helpful when learning a specific part of a song or music..",
   },
   {
     "title": "Tuner",
     "link": "tuner",
     "icon": "/tuner.png",
-    "description": "Tune your musical instrument to perfect pitch, without having to keep a seperate app installed in your phone taking unnecessary space, directly from the site online!",
+    "description": "Experience the convenience of tuning your musical instrument to perfect pitch without the hassle of installing a separate app on your phone. Say goodbye to unnecessary storage consumption and welcome the simplicity of tuning directly from our website!",
   }
 ]
 
